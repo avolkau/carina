@@ -1525,7 +1525,7 @@ public class ExtendedWebElement {
 
 				
 				final Select s = new Select(element);
-				s.selectByVisibleText(decryptedSelectText);
+				s.selectByValue(decryptedSelectText);
 				return true;
 			}
 
@@ -1555,7 +1555,7 @@ public class ExtendedWebElement {
 						break;
 					}
 				}
-				s.selectByVisibleText(fullTextValue);
+				s.selectByValue(fullTextValue);
 				return true;
 			}
 
@@ -1574,7 +1574,7 @@ public class ExtendedWebElement {
 						break;
 					}
 				}
-				s.selectByVisibleText(fullTextValue);
+				s.selectByValue(fullTextValue);
 				return true;
 			}
 
