@@ -20,7 +20,11 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +35,19 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.testng.*;
-import org.testng.annotations.*;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
+import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.xml.XmlTest;
 
 import com.amazonaws.services.s3.model.S3Object;
@@ -45,16 +59,23 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.listeners.AbstractTestListener;
-import com.qaprosoft.carina.core.foundation.report.*;
+import com.qaprosoft.carina.core.foundation.report.Artifacts;
+import com.qaprosoft.carina.core.foundation.report.HtmlReportGenerator;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.report.TestResultItem;
+import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailManager;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRail;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
-import com.qaprosoft.carina.core.foundation.utils.*;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.DriverMode;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.DateUtils;
+import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
 import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
@@ -63,7 +84,6 @@ import com.qaprosoft.carina.core.foundation.utils.resources.I18N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 import com.qaprosoft.hockeyapp.HockeyAppManager;
@@ -94,6 +114,8 @@ public abstract class AbstractTest // extends DriverHelper
     @BeforeSuite(alwaysRun = true)
     public void executeBeforeTestSuite(ITestContext context) {
 
+        // TODO: move out from AbstractTest->executeBeforeTestSuite
+        
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         // Set log4j properties
@@ -162,19 +184,6 @@ public abstract class AbstractTest // extends DriverHelper
             L10Nparser.init();
         } catch (Exception e) {
             LOGGER.error("L10Nparser bundle is not initialized successfully!", e);
-        }
-
-        // TODO: move out from AbstractTest->executeBeforeTestSuite
-        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty()) {
-            // redefine core CONFIG properties using custom capabilities file
-            new CapabilitiesLoader().loadCapabilities(customCapabilities);
-        }
-
-        String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
-        if (!extraCapabilities.isEmpty()) {
-            // redefine core CONFIG properties using extra capabilities file
-            new CapabilitiesLoader().loadCapabilities(extraCapabilities);
         }
 
         try {
@@ -262,6 +271,7 @@ public abstract class AbstractTest // extends DriverHelper
 
     @AfterSuite(alwaysRun = true)
     public void executeAfterTestSuite(ITestContext context) {
+        // TODO: move out from AbstractTest->executeAfterTestSuite
         try {
             if (Configuration.getDriverMode() == DriverMode.SUITE_MODE) {
                 LOGGER.debug("Deinitialize driver(s) in UITest->AfterSuite.");

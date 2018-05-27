@@ -43,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.device.DevicePool;
 
 @SuppressWarnings("deprecation")
@@ -264,6 +265,19 @@ public class AbstractTestListener extends TestArgsListener {
          * //dropbox client initialization if (!Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN).isEmpty()) {
          * dropboxClient = new DropboxClient(Configuration.get(Parameter.DROPBOX_ACCESS_TOKEN)); }
          */
+        
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            // redefine core CONFIG properties using custom capabilities file
+            new CapabilitiesLoader().loadCapabilities(customCapabilities);
+        }
+
+        String extraCapabilities = Configuration.get(Parameter.EXTRA_CAPABILITIES);
+        if (!extraCapabilities.isEmpty()) {
+            // redefine core CONFIG properties using extra capabilities file
+            new CapabilitiesLoader().loadCapabilities(extraCapabilities);
+        }
+        
         super.onStart(context);
     }
 
