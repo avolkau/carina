@@ -288,20 +288,6 @@ public abstract class AbstractTest // extends DriverHelper
             ReportContext.removeTempDir(); // clean temp artifacts directory
             HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
-            String browser = getBrowser();
-            String deviceName = getDeviceName();
-            // String suiteName = getSuiteName(context);
-            String title = getTitle(context);
-
-            String env = "";
-            if (!Configuration.isNull(Parameter.ENV)) {
-                env = Configuration.get(Parameter.ENV);
-            }
-
-            if (!Configuration.get(Parameter.URL).isEmpty()) {
-                env += " - <a href='" + Configuration.get(Parameter.URL) + "'>" + Configuration.get(Parameter.URL) + "</a>";
-            }
-
             ReportContext.getTempDir().delete();
 
             // Update JIRA
@@ -429,17 +415,6 @@ public abstract class AbstractTest // extends DriverHelper
                         reportLinks);
             }
         }
-    }
-
-    // TODO: remove method and CI_* arguments from core
-    private String getCIJobReference() {
-        String ciTestJob = null;
-        if (!Configuration.isNull(Parameter.CI_URL)
-                && !Configuration.isNull(Parameter.CI_BUILD)) {
-            ciTestJob = Configuration.get(Parameter.CI_URL)
-                    + Configuration.get(Parameter.CI_BUILD);
-        }
-        return ciTestJob;
     }
 
     /**
