@@ -122,10 +122,6 @@ public class Configuration {
 
         REPORT_URL("report_url"),
 
-        EMAIL_LIST("email_list"),
-
-        FAILURE_EMAIL_LIST("failure_email_list"),
-
         TRACK_KNOWN_ISSUES("track_known_issues"),
 
         AUTO_SCREENSHOT("auto_screenshot"),
@@ -162,10 +158,6 @@ public class Configuration {
         SMALL_SCREEN_WIDTH("small_screen_width"),
 
         SMALL_SCREEN_HEIGHT("small_screen_height"),
-
-        SENDER_EMAIL("sender_email"),
-
-        SENDER_PASSWORD("sender_pswd"),
 
         INIT_RETRY_COUNT("init_retry_count"),
 
