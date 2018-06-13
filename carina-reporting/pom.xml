@@ -37,12 +37,6 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 
-		<!-- carina-reporting only dependencies -->
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
-
 		<!-- Zafira -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
